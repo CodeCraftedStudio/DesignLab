@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm run build",
+  "buildCommand": "pnpm run vercel-build",
   "outputDirectory": "artifacts/designlab-pro/dist/public",
   "framework": "vite",
   "rewrites": [
