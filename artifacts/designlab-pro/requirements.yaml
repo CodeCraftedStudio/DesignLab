@@ -1,0 +1,16 @@
+packages:
+  "zustand": "State management for offline-first design tools without complex providers"
+  "jszip": "ZIP file generation for exporting design tokens and projects"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Merge tailwind classes seamlessly"
+  "framer-motion": "Animations for the UI elements and transitions"
+  "lucide-react": "Beautiful SVG icons for the interface"
+
+images:
+  - path: "artifacts/designlab-pro/public/images/abstract-bg.png"
+    description: "Dark professional abstract geometric background with indigo and violet neon accents, monospace aesthetic"
+    aspect_ratio: "16:9"
+
+notes:
+  - This is a pure frontend application. No backend or API routes are needed.
+  - All state is managed client-side using Zustand.

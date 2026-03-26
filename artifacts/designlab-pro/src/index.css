@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover-border: var(--popover-border);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --font-sans: 'JetBrains Mono', monospace;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT THEME
+   ═══════════════════════════════════════════ */
+:root {
+  /* Tailwind-compatible color tokens (full hsl values) */
+  --background: hsl(240, 20%, 98%);
+  --foreground: hsl(240, 20%, 5%);
+  
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 20%, 5%);
+  --card-border: hsl(240, 10%, 90%);
+
+  --sidebar: hsl(0, 0%, 100%);
+  --sidebar-foreground: hsl(240, 20%, 5%);
+  --sidebar-border: hsl(240, 10%, 90%);
+
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 20%, 5%);
+  --popover-border: hsl(240, 10%, 90%);
+
+  --primary: hsl(243, 75%, 59%);
+  --primary-foreground: hsl(0, 0%, 100%);
+
+  --secondary: hsl(240, 10%, 90%);
+  --secondary-foreground: hsl(240, 20%, 5%);
+
+  --muted: hsl(240, 10%, 94%);
+  --muted-foreground: hsl(240, 10%, 40%);
+
+  --accent: #6366f1;
+  --accent-foreground: hsl(0, 0%, 100%);
+
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  --border: #e2e2ed;
+  --input: hsl(240, 10%, 90%);
+  --ring: hsl(243, 75%, 59%);
+
+  --radius: 0.5rem;
+
+  /* ── DesignLab Pro Theme Tokens (light) ── */
+  --bg: #f8f8fc;
+  --bg-secondary: #f0f0f7;
+  --surface: #ffffff;
+  --surface2: #f4f4f8;
+  --text: #111128;
+  --text-secondary: #6b6b8a;
+  --text-muted: #9999bb;
+  --accent-hover: #4f46e5;
+  --accent-soft: rgba(99,102,241,0.12);
+  --accent-glow: rgba(99,102,241,0.25);
+  --border-strong: #c8c8dd;
+  --success: #22c55e;
+  --success-soft: rgba(34,197,94,0.12);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245,158,11,0.12);
+  --error: #ef4444;
+  --error-soft: rgba(239,68,68,0.12);
+  --info: #3b82f6;
+  --info-soft: rgba(59,130,246,0.12);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.12), 0 8px 16px rgba(0,0,0,.06);
+  --shadow-xl: 0 32px 80px rgba(0,0,0,.15), 0 16px 32px rgba(0,0,0,.08);
+  --transition: 300ms ease;
+  --transition-fast: 150ms ease;
+  --transition-slow: 600ms ease;
+}
+
+/* ═══════════════════════════════════════════
+   DARK THEME
+   ═══════════════════════════════════════════ */
+.dark {
+  --background: hsl(240, 20%, 5%);
+  --foreground: hsl(240, 20%, 98%);
+  
+  --card: hsl(240, 20%, 8%);
+  --card-foreground: hsl(240, 20%, 98%);
+  --card-border: hsl(240, 20%, 15%);
+
+  --sidebar: hsl(240, 20%, 7%);
+  --sidebar-foreground: hsl(240, 20%, 98%);
+  --sidebar-border: hsl(240, 20%, 15%);
+
+  --popover: hsl(240, 20%, 8%);
+  --popover-foreground: hsl(240, 20%, 98%);
+  --popover-border: hsl(240, 20%, 15%);
+
+  --primary: hsl(243, 75%, 59%);
+  --primary-foreground: hsl(0, 0%, 100%);
+
+  --secondary: hsl(240, 20%, 15%);
+  --secondary-foreground: hsl(240, 20%, 98%);
+
+  --muted: hsl(240, 20%, 15%);
+  --muted-foreground: hsl(240, 10%, 65%);
+
+  --accent: #6366f1;
+  --accent-foreground: hsl(0, 0%, 100%);
+
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  --border: #1e1e2e;
+  --input: hsl(240, 20%, 15%);
+  --ring: hsl(243, 75%, 59%);
+
+  /* ── DesignLab Pro Theme Tokens (dark) ── */
+  --bg: #0a0a0f;
+  --bg-secondary: #0d0d14;
+  --surface: #16161f;
+  --surface2: #1c1c28;
+  --text: #e2e2f0;
+  --text-secondary: #6b6b8a;
+  --text-muted: #44445a;
+  --accent-hover: #4f46e5;
+  --accent-soft: rgba(99,102,241,0.12);
+  --accent-glow: rgba(99,102,241,0.25);
+  --border-strong: #2a2a3e;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.5);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.6);
+  --shadow-xl: 0 32px 80px rgba(0,0,0,.7);
+}
+
+/* ═══════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply font-bold tracking-tight;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  @apply bg-background/80 backdrop-blur-md border-b border-border;
+}
+
+/* Shortcut row hover */
+.shortcut-row:hover {
+  background-color: var(--surface2);
+}
+
+/* Code Editor syntax highlighting */
+.syntax-keyword { color: #c678dd; }
+.syntax-string { color: #98c379; }
+.syntax-function { color: #61afef; }
+.syntax-comment { color: #5c6370; font-style: italic; }
+.syntax-number { color: #d19a66; }
+.syntax-tag { color: #e06c75; }
+.syntax-attr { color: #d19a66; }
+
+/* Randomize button animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  from { opacity: 0.7; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1.03); }
+}

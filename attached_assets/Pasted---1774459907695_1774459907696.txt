@@ -1,0 +1,1106 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROJECT: DesignLab Pro — Universal Design System Playground
+PLATFORM: Replit (Vite + React 18 + TypeScript)
+GOAL: The most advanced offline-first design tool ever built for web designers and frontend developers
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+═══════════════════════════════════════════════════════════════
+SECTION 0 — SELF-CHECK PROTOCOL (EXECUTE BEFORE AND AFTER)
+═══════════════════════════════════════════════════════════════
+BEFORE writing any file:
+  - Map every feature to a specific file and component
+  - Plan all TypeScript interfaces and shared state contracts
+  - Identify all shared utilities (color math, SVG generators, code generators)
+  - Ensure zero circular imports
+
+AFTER completing all files:
+  - Verify every import resolves to an existing file
+  - Verify every button/control produces a visible, correct result
+  - Verify zero state bleed between tool tabs
+  - Verify all ZIP downloads produce valid file structures
+  - Verify all animated backgrounds run without canvas/WebGL
+  - Verify all code generators output syntactically valid code
+  - Fix every error before final output
+
+═══════════════════════════════════════════════════════════════
+SECTION 1 — PROJECT STRUCTURE & TECH STACK
+═══════════════════════════════════════════════════════════════
+Stack: Vite 5 + React 18 + TypeScript 5 + CSS Modules
+Package manager: npm
+
+File structure (generate ALL files completely — no stubs):
+
+  designlab-pro/
+  ├── index.html
+  ├── vite.config.ts
+  ├── tsconfig.json
+  ├── package.json
+  ├── src/
+  │   ├── main.tsx
+  │   ├── App.tsx
+  │   ├── styles/
+  │   │   ├── global.css          (CSS custom properties, reset, shell styles)
+  │   │   ├── themes.css          (light/dark theme variable overrides)
+  │   │   └── animations.css      (all @keyframes used across the app)
+  │   ├── types/
+  │   │   └── index.ts            (all shared TypeScript interfaces)
+  │   ├── store/
+  │   │   ├── useToolStore.ts     (Zustand store — all tool states)
+  │   │   └── useHistoryStore.ts  (global undo/redo per tool)
+  │   ├── utils/
+  │   │   ├── colorMath.ts        (WCAG, hex/rgb/hsl conversion, interpolation)
+  │   │   ├── gradientBuilder.ts  (CSS gradient string generator)
+  │   │   ├── codeGenerators.ts   (JSX/HTML/CSS/SCSS/Tailwind/Framer/GSAP output)
+  │   │   ├── zipExporter.ts      (JSZip-based project export)
+  │   │   ├── svgCharts.ts        (pure SVG chart math: polyline, arc, dasharray)
+  │   │   └── backgroundAnimations.ts (CSS @keyframes injector, rAF loop manager)
+  │   ├── components/
+  │   │   ├── shell/
+  │   │   │   ├── Navbar.tsx
+  │   │   │   ├── Breadcrumb.tsx
+  │   │   │   ├── BrowserChrome.tsx
+  │   │   │   ├── DeviceFrame.tsx
+  │   │   │   ├── Toast.tsx
+  │   │   │   └── KeyboardShortcuts.tsx
+  │   │   ├── controls/
+  │   │   │   ├── ColorPicker.tsx     (unified: native input + hex + RGB + HSL)
+  │   │   │   ├── Slider.tsx
+  │   │   │   ├── Toggle.tsx
+  │   │   │   ├── CodeBlock.tsx       (syntax highlighted, copy button)
+  │   │   │   ├── TabBar.tsx
+  │   │   │   └── CollapsibleSection.tsx
+  │   │   └── shared/
+  │   │       ├── SvgIcon.tsx         (renders any hand-written SVG path)
+  │   │       └── CopyButton.tsx
+  │   ├── tools/
+  │   │   ├── colors/
+  │   │   │   ├── ColorsTab.tsx
+  │   │   │   ├── SolidColorPanel.tsx
+  │   │   │   ├── GradientPanel.tsx
+  │   │   │   ├── PaletteGenerator.tsx
+  │   │   │   ├── HarmonyWheel.tsx        (SVG color wheel)
+  │   │   │   └── previews/
+  │   │   │       ├── HomePreview.tsx
+  │   │   │       ├── DashboardPreview.tsx
+  │   │   │       │   ├── AnalyticsPage.tsx
+  │   │   │       │   ├── UsersPage.tsx
+  │   │   │       │   ├── SettingsPage.tsx
+  │   │   │       │   ├── ReportsPage.tsx
+  │   │   │       │   ├── BillingPage.tsx
+  │   │   │       │   └── NotificationsPage.tsx
+  │   │   │       └── AuthPreview.tsx
+  │   │   ├── libraries/
+  │   │   │   ├── LibrariesTab.tsx
+  │   │   │   ├── libraryThemes.ts        (10 library CSS token configs)
+  │   │   │   ├── iconData.ts             (all 200+ hand-written SVG paths per library)
+  │   │   │   ├── componentData.ts        (all component variant configs)
+  │   │   │   ├── performanceData.ts      (hardcoded benchmark data)
+  │   │   │   ├── sections/
+  │   │   │   │   ├── IconBrowser.tsx
+  │   │   │   │   ├── ComponentShowcase.tsx
+  │   │   │   │   ├── PerformanceLeaderboard.tsx
+  │   │   │   │   └── LibraryDetail.tsx
+  │   │   │   └── previews/
+  │   │   │       └── LibraryPreviewRenderer.tsx
+  │   │   ├── typography/
+  │   │   │   ├── TypographyTab.tsx
+  │   │   │   └── TypeScalePreview.tsx
+  │   │   ├── spacing/
+  │   │   │   ├── SpacingTab.tsx
+  │   │   │   └── SpacingPreview.tsx
+  │   │   ├── shadows/
+  │   │   │   ├── ShadowsTab.tsx
+  │   │   │   └── ShadowPreview.tsx
+  │   │   ├── animations/
+  │   │   │   ├── AnimationsTab.tsx
+  │   │   │   ├── BezierVisualizer.tsx
+  │   │   │   └── AnimationPreview.tsx
+  │   │   ├── backgrounds/
+  │   │   │   ├── BackgroundsTab.tsx
+  │   │   │   ├── backgroundTypes.ts      (all 60 background configs)
+  │   │   │   ├── BackgroundRenderer.tsx  (CSS injection + rAF manager)
+  │   │   │   └── BackgroundPreview.tsx
+  │   │   ├── auth/
+  │   │   │   ├── AuthTab.tsx
+  │   │   │   └── pages/
+  │   │   │       ├── SignIn.tsx
+  │   │   │       ├── SignUp.tsx
+  │   │   │       ├── ForgotPassword.tsx
+  │   │   │       ├── ResetPassword.tsx
+  │   │   │       ├── OtpVerify.tsx
+  │   │   │       ├── MagicLink.tsx
+  │   │   │       ├── SsoEnterprise.tsx
+  │   │   │       ├── TwoFactorAuth.tsx
+  │   │   │       ├── AccountLocked.tsx
+  │   │   │       └── SessionExpired.tsx
+  │   │   ├── codeeditor/
+  │   │   │   ├── CodeEditorTab.tsx
+  │   │   │   ├── LivePreviewPane.tsx
+  │   │   │   ├── CodeEditorPane.tsx
+  │   │   │   ├── LanguageSelector.tsx
+  │   │   │   └── ZipExportPanel.tsx
+  │   │   └── canvas/
+  │   │       ├── CanvasTab.tsx
+  │   │       ├── DragDropCanvas.tsx
+  │   │       ├── ComponentPalette.tsx
+  │   │       ├── CanvasElement.tsx
+  │   │       └── CanvasInspector.tsx
+  │   └── export/
+  │       └── ExportModal.tsx
+
+Dependencies (package.json must include exact versions):
+  "react": "^18.3.1"
+  "react-dom": "^18.3.1"
+  "typescript": "^5.5.3"
+  "vite": "^5.4.2"
+  "@vitejs/plugin-react": "^4.3.1"
+  "zustand": "^5.0.0"          (global state management)
+  "jszip": "^3.10.1"           (ZIP export)
+  "clsx": "^2.1.1"             (className utility)
+
+NO other external UI libraries. All UI is hand-crafted CSS.
+
+═══════════════════════════════════════════════════════════════
+SECTION 2 — GLOBAL SHELL & THEME SYSTEM
+═══════════════════════════════════════════════════════════════
+CSS Custom Properties in :root (light theme default):
+  --bg: #f8f8fc
+  --bg-secondary: #f0f0f7
+  --sidebar: #ffffff
+  --surface: #ffffff
+  --surface2: #f4f4f8
+  --border: #e2e2ed
+  --text: #111128
+  --text-secondary: #6b6b8a
+  --accent: #6366f1
+  --accent-hover: #4f46e5
+  --accent-glow: rgba(99,102,241,0.15)
+  --success: #22c55e
+  --warning: #f59e0b
+  --error: #ef4444
+  --radius: 8px
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06)
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08)
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.12)
+
+[data-theme="dark"] overrides:
+  --bg: #0a0a0f
+  --bg-secondary: #111118
+  --sidebar: #111118
+  --surface: #16161f
+  --surface2: #1c1c28
+  --border: #1e1e2e
+  --text: #e2e2f0
+  --text-secondary: #6b6b8a
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3)
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4)
+  --shadow-lg: 0 16px 40px rgba(0,0,0,.6)
+
+Theme toggle: moon/sun SVG icon button in navbar, toggles data-theme on <html> element, persists in React state (NOT localStorage — in-memory only per session)
+
+Typography:
+  Shell font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace (all labels, values, code, inputs)
+  Section headers: 'Syne', system-ui, sans-serif
+  Load both via @import in global.css (with system fallbacks for offline)
+
+Navbar (48px height, border-bottom: 1px solid var(--border)):
+  Left: logo "DesignLab ✦" — Syne 800, --accent color ✦ glyph
+  Center: 10 main tabs as pill buttons (active: accent bg, inactive: transparent with hover surface2):
+    🎨 Colors | 🧩 UI Libraries | 🔤 Typography | 📐 Spacing | 🌑 Shadows | ✨ Animations | 🌐 Backgrounds | 🔐 Auth | 💻 Code Editor | 🖼 Canvas
+  Right: icon-only buttons with tooltip on hover:
+    ☀️/🌙 Theme toggle
+    ← Undo (disabled if empty)
+    → Redo (disabled if empty)
+    📱 Device frame dropdown (Desktop/Laptop/Tablet/Mobile/Mobile-L)
+    🎲 Surprise Me (randomizes all controls)
+    📤 Export All
+    ⌨ Keyboard shortcuts modal
+
+Browser Chrome wrapper (right panel):
+  Outer: 1px solid var(--border), border-radius 12px, var(--shadow-lg)
+  Chrome bar: 36px height, var(--surface2) bg
+    Left: 3 traffic dots red #ff5f57 / yellow #ffbd2e / green #28c840
+    Center: URL bar display-only, rounded pill, var(--surface) bg, 12px monospace text (e.g. "preview.designlab.local/colors")
+    Right: refresh SVG icon (300ms spin animation on state change)
+  Content area: the live preview, clipped to border-radius
+
+Device frame dimensions and CSS shapes:
+  Desktop: no frame, full width preview
+  Laptop: 1280px max-width, subtle bezel effect (outer border 12px solid #1a1a2a, border-radius 12px, notch hint at top)
+  Tablet: 768px wide, portrait 1024px tall (or landscape toggle), CSS bezel: border 16px solid #1a1a2a, border-radius 20px, home button circle bottom center
+  Mobile (390px): 390px wide, 844px tall, border 10px solid #1a1a2a, border-radius 44px, notch div top center (120px wide, 30px tall, bg #1a1a2a, border-radius 0 0 20px 20px), home indicator bar bottom center (120px wide, 4px, bg rgba(255,255,255,0.3), border-radius 2px)
+  Mobile-L (430px): same as Mobile but 430px wide
+  Rotate button: swaps width/height for tablet/mobile
+
+Breadcrumb: 11px JetBrains Mono, var(--text-secondary), flex row with › separator, shows full state path
+
+Left control panel: 288px fixed width, independently scrollable, var(--sidebar) bg, border-right: 1px solid var(--border)
+  CollapsibleSection component: header with ▶/▼ chevron (SVG), Syne 600 label, 12px, toggles content visibility with max-height CSS transition
+
+Toast system: fixed bottom-right stack, multiple simultaneous, slide-in from right 300ms, auto-dismiss 2000ms
+  Types: success (--success border) / error (--error) / info (--accent) / warning (--warning)
+  Messages: "✓ Copied to clipboard" / "↩ Undone" / "↪ Redone" / "✓ Saved" / "↓ Downloading..."
+
+Undo/redo per tool:
+  useHistoryStore.ts: Zustand store with Map<toolId, {past: T[], present: T, future: T[]}> structure
+  pushState(toolId, newState): moves present to past, clears future, max 50 entries
+  undo(toolId): moves present to future, pops past
+  redo(toolId): moves present to past, pops future
+  Every meaningful control change in every tool calls pushState
+
+Keyboard shortcuts (global keydown listener in App.tsx):
+  1–0: switch tabs 1–10
+  Ctrl/Cmd+Z: undo active tool
+  Ctrl/Cmd+Shift+Z: redo active tool
+  T: toggle dark/light theme
+  R: randomize active tool
+  S: save/snapshot active tool state
+  E: open export modal
+  ?: open shortcuts modal
+  Escape: close any open modal/panel
+
+"Surprise Me" button:
+  Randomizes all color pickers to a harmonious random palette
+  Randomizes active library to a random one
+  Randomizes background animation to a random type with random colors
+  Randomizes font pairing in typography tool
+  Plays a 600ms "shuffling" CSS animation (rapid color flash on all swatches)
+
+═══════════════════════════════════════════════════════════════
+SECTION 3 — UTILITY MODULES (implement fully in /utils/)
+═══════════════════════════════════════════════════════════════
+
+colorMath.ts — export all these functions:
+  hexToRgb(hex: string): {r:number, g:number, b:number}
+  rgbToHex(r,g,b): string
+  rgbToHsl(r,g,b): {h:number, s:number, l:number}
+  hslToRgb(h,s,l): {r:number, g:number, b:number}
+  linearize(c: number): number  → c<=0.04045 ? c/12.92 : ((c+0.055)/1.055)^2.4
+  relativeLuminance(hex): number  → 0.2126*R + 0.7152*G + 0.0722*B (linearized)
+  contrastRatio(hex1, hex2): number  → (max(L1,L2)+0.05)/(min(L1,L2)+0.05)
+  wcagLevel(ratio): 'AAA'|'AA'|'AA Large'|'Fail'
+  generateHarmony(hex, type): string[]  → complementary/analogous/triadic/tetradic/split/monochromatic
+  generateTints(hex, steps): string[]  → steps tints from white to color
+  generateShades(hex, steps): string[]  → steps shades from color to black
+  lerpHex(hex1, hex2, t, mode: 'rgb'|'hsl'|'lab'): string  → interpolate at t 0..1
+  generateStops(hex1, hex2, count, mode): string[]  → N interpolated stops
+  randomAccessiblePair(): {bg:string, text:string}  → random pair with contrast ≥ 4.5:1
+  hexToHsla(hex, alpha): string  → "hsla(h, s%, l%, alpha)"
+  adjustLightness(hex, delta): string  → lighten/darken by delta (-100..100)
+  isLight(hex): boolean  → luminance > 0.4
+  namedColors: Record<string, string>  → 140 CSS named colors as hex values
+
+gradientBuilder.ts:
+  buildLinearGradient(angle, stops: {color:string, position:number}[]): string
+  buildRadialGradient(shape, posX, posY, size, stops): string
+  buildConicGradient(fromAngle, posX, posY, stops): string
+  stopsToCss(stops): string  → "color position%, color position%, ..."
+  presetGradients: Record<string, GradientConfig>  → 16 named presets with full stop arrays
+  gradientToSvgLinearGradient(id, stops, angle): string  → SVG <linearGradient> XML
+  gradientToTailwind(config): string  → Tailwind backgroundImage value
+
+codeGenerators.ts:
+  generateCssVariables(tokens): string
+  generateScssVariables(tokens): string
+  generateTailwindConfig(tokens): string
+  generateStyleDictionaryJson(tokens): string
+  generateFigmaTokensJson(tokens): string
+  generateReactComponent(componentName, props, styles, jsx): string  → full .tsx file content
+  generateHtmlComponent(name, html, css): string  → full .html file content
+  generateFramerMotionProps(animation): string
+  generateGsapConfig(animation): string
+  generateCssKeyframes(animation): string
+  generateMuiTheme(colors): string
+  generateChakraTheme(colors): string
+  generateAntTokens(colors): string
+  generateShadcnCssVars(colors): string
+  generateTailwindPreset(library): string
+
+svgCharts.ts:
+  polylinePoints(data: number[], width, height, padding): string  → "x1,y1 x2,y2 ..."
+  areaPolygon(data, width, height, padding): string  → SVG polygon points including baseline
+  barRects(data, width, height, padding, barWidth): {x,y,w,h,value}[]
+  donutSegments(data: number[], cx, cy, r, innerR): {d:string, color:string}[]  → stroke-dasharray paths
+  radarPolygon(data: number[], cx, cy, maxR, axes): string  → polygon points for radar chart
+  sparklinePoints(data: number[], width, height): string
+  generateAxisLabels(min, max, steps): string[]
+  gridLines(count, width, height, padding): {x1,y1,x2,y2}[]
+
+zipExporter.ts (uses JSZip):
+  exportReactProject(name, components: {filename:string, content:string}[]): Promise<void>
+    - Creates JSZip instance
+    - Adds package.json, vite.config.ts, index.html, tsconfig.json, src/main.tsx
+    - Adds each component file
+    - Generates zip blob, triggers browser download via URL.createObjectURL + <a>.click()
+  exportHtmlProject(name, files): Promise<void>
+    - Single index.html + styles.css + readme.txt
+  exportCssTokens(tokens): Promise<void>
+    - tokens.css + _tokens.scss + tailwind.config.js + tokens.json
+
+backgroundAnimations.ts:
+  ANIMATION_REGISTRY: Record<string, AnimationConfig>  → all 60 background types
+  injectKeyframes(id, css): void  → document.getElementById('bg-style-tag').textContent += css (or create if not exists)
+  clearKeyframes(): void
+  startRafLoop(id, tick: (t:number)=>void): void  → stores requestAnimationFrame ID
+  stopRafLoop(id): void  → cancelAnimationFrame
+  generateAnimationCss(config: AnimationConfig, params): string  → full CSS for this animation
+  generateReactComponent(config, params): string  → self-contained React component string
+
+═══════════════════════════════════════════════════════════════
+SECTION 4 — TOOL 1: COLOR PALETTE & CONTRAST TESTER
+═══════════════════════════════════════════════════════════════
+State interface (TypeScript):
+  interface ColorToolState {
+    roles: { background:string, text:string, primary:string, border:string, surface:string }
+    inputFormat: 'hex'|'rgb'|'hsl'
+    gradient: GradientConfig
+    gradientMode: 'linear'|'radial'|'conic'
+    mixMode: 'rgb'|'hsl'|'lab'
+    mixColor1: string
+    mixColor2: string
+    mixRatio: number
+    paletteMode: 'monochromatic'|'complementary'|'analogous'|'triadic'|'tetradic'|'random'|'pastel'|'neon'|'earth'|'dark'
+    savedPalettes: SavedPalette[]
+    previewTab: 'home'|'dashboard'|'auth'
+    dashboardPage: 'analytics'|'users'|'settings'|'reports'|'billing'|'notifications'
+    useGradientBg: boolean
+  }
+
+SOLID COLOR PANEL — SolidColorPanel.tsx:
+  5 color role pickers. Each ColorPicker.tsx renders:
+    Native <input type="color"> (40×40px, rounded)
+    Format toggle: HEX | RGB | HSL (pill buttons)
+    HEX: single text input with # prefix, validates /^[0-9A-Fa-f]{6}$/
+    RGB: 3 sliders (0–255) + 3 number inputs (R G B), all synced
+    HSL: 3 sliders (H:0–360, S:0–100, L:0–100) + 3 number inputs, all synced
+    All formats stay in sync — changing any updates all others via colorMath utils
+    Large swatch (64×40px, border-radius 8px, var(--border) border)
+    Copy HEX button | Copy RGB button | Copy HSL button
+
+  WCAG Panel:
+    3 pair comparisons: Bg↔Text / Bg↔Primary / Primary↔Text
+    Each shows: large ratio number (e.g. "7.43 : 1") + AA badge + AAA badge + use-case checklist
+    Use cases: Normal Text (AA≥4.5) / Large Text (AA≥3.0) / UI Components (≥3.0) / Decorative (any)
+    Badge colors: green if pass, red if fail
+
+  Color Harmonies Panel — HarmonyWheel.tsx:
+    SVG color wheel (200×200px): 360 thin radial segments, each colored at that hue
+    Current color marked with white ring indicator on wheel
+    Click wheel to change primary color
+    Below wheel: harmony type selector buttons (6 types)
+    Generated swatches row: each clickable (applies to selected role)
+    Tints/Shades row: 9-step scale, each clickable
+
+  Saved Palettes:
+    Save button → dialog for naming → stores {id, name, roles, timestamp} in state array
+    Each palette: 5 small swatches + name + "Load" + "Delete" + "Export JSON" (single palette)
+    Max 20 palettes
+    "Export All Palettes JSON" button → downloads JSON blob
+
+GRADIENT PANEL — GradientPanel.tsx:
+  Type toggle: Linear | Radial | Conic (updates controls shown)
+
+  Linear controls:
+    Angle slider 0–360° + number input (live)
+    8 direction preset buttons: → ↗ ↑ ↖ ← ↙ ↓ ↘ (SVG arrow icons, sets angle)
+
+  Radial controls:
+    Shape: Circle | Ellipse radio
+    Position X: 0–100% slider + number input
+    Position Y: 0–100% slider + number input
+    Size: dropdown → closest-side / closest-corner / farthest-side / farthest-corner
+
+  Conic controls:
+    From-angle: 0–360° slider + number input
+    At X: 0–100% / At Y: 0–100% sliders
+
+  Color stops (up to 8):
+    Each: color picker (ColorPicker.tsx) + position slider 0–100% + position number input + delete ✕ button
+    Interactive gradient bar: clickable to add stop at that position, stops shown as draggable handles
+    Drag handles along bar: mousedown → mousemove → mouseup, updates position
+    "Add Stop" button
+
+  DOUBLE COLOR MIX MODE:
+    Toggle switch "Mix Two Colors"
+    Two master ColorPicker.tsx components side by side
+    Blend ratio: 0–100% slider with live color preview at 50%
+    Mode buttons: RGB | HSL | LAB
+    Shows: intermediate swatch + hex value at mix ratio
+    "Expand to Gradient" → populates 5 stops interpolated between the two colors
+    Auto-updates gradient preview
+
+  Gradient preview bar: 100% width, 80px tall, border-radius 8px, live CSS gradient applied
+
+  16 preset swatches: 60×40px each, live gradient CSS applied to each (in a 4×4 grid)
+  Clicking loads that preset's config into all controls
+
+  Copy buttons:
+    CSS gradient string
+    Tailwind backgroundImage value
+    SVG linearGradient XML
+    "Use as Background" → sets useGradientBg:true and applies to preview
+
+PALETTE GENERATOR:
+  10 generation modes + base color picker + "Generate" button + "Shuffle" button
+  Per generated color: lock SVG icon toggle (locked = excluded from re-generation)
+  Result: 5 color swatches with hex labels
+  Apply all → sets each color to a role
+  Copy as CSS vars / Tailwind config buttons
+
+PREVIEW PANEL — BrowserChrome.tsx wraps:
+  Tab switcher: 🏠 Home | 📊 Dashboard | 🔐 Auth (each isolated state)
+
+HOME PREVIEW — HomePreview.tsx (full implementation):
+  All colors from current roles + gradient if useGradientBg
+  Navbar: logo + 4 nav links + CTA button + hamburger SVG (mobile)
+  Hero: H1 + subheadline + 2 CTA buttons + abstract SVG blob decoration (generated from current primary color)
+  Features: 3 cards (SVG icon + title + body + "Learn more →")
+  Stats bar: 3 large stats numbers + labels
+  Testimonials: 2 cards (quote text + star rating SVG + avatar initial circle + name + role)
+  CTA Banner: gradient or solid full-width strip + headline + button
+  Footer: logo + 3 link columns + 3 social SVG icons (X/GitHub/LinkedIn paths) + copyright
+
+DASHBOARD PREVIEW — DashboardPreview.tsx with full sidebar + 6 pages:
+  Sidebar: 240px, logo + user avatar circle (initials) + name + role + 6 nav items all clickable
+  Each nav item: hand-written SVG icon + label, active = accent bg, hover = surface2
+  Sidebar collapse toggle (SVG chevron) → 64px icon-only mode
+
+  AnalyticsPage.tsx:
+    Date range dropdown (styled select)
+    4 KPI cards: Revenue ($124,520 +12.5%) / Active Users (48,293 +8.2%) / Conversion (3.24% -0.8%) / Avg Session (4m 32s +15.3%)
+    Each card: SVG icon + formatted number + trend badge (green up arrow / red down arrow) + mini sparkline (6-point SVG polyline, 64×28px)
+    SVG Line Chart (100% width, 220px height):
+      12 monthly data points hardcoded for 2 series
+      Drawn via svgCharts.polylinePoints()
+      X axis: Jan–Dec labels, Y axis: 5 value labels
+      Horizontal grid lines: 5, dashed, var(--border) stroke
+      Two polylines: different colors, 2px stroke
+      12 circle dots per series, :hover title attribute for tooltip
+      SVG linearGradient fill under each line (area chart effect)
+    SVG Bar Chart (100% width, 200px):
+      8 category bars, heights from hardcoded data via svgCharts.barRects()
+      Each bar: rounded top corners (rx="4"), accent color fill
+      Hover: filter: brightness(1.1)
+      Value label above each bar, category label below
+    SVG Donut Chart (200×200px):
+      4 segments via svgCharts.donutSegments()
+      stroke-dasharray + stroke-dashoffset calculated correctly
+      Center: total number label
+      Legend: 4 colored squares + labels + percentages beside chart
+    SVG Area Chart (100% width, 160px):
+      Filled polygon via svgCharts.areaPolygon()
+      SVG linearGradient: accent→transparent, vertical
+      Smooth line above fill (polyline)
+    Top Pages table: rank + page + views + bounce % + avg time + trend SVG arrow — 5 rows
+
+  UsersPage.tsx:
+    4 stat cards: Total (48,293) / New This Month (+1,204) / Active (38,847) / Churned (847)
+    Search input (SVG search icon inside, border, rounded) + Role filter dropdown + Status filter + "Add User" button
+    Table (10 rows):
+      Col 1: checkbox (styled square with checkmark SVG when checked)
+      Col 2: avatar (40px circle, bg from user's color, white initials 2 chars)
+      Col 3: full name (bold) + email (muted small)
+      Col 4: Role badge (Admin=purple, Editor=blue, Viewer=gray, Owner=amber)
+      Col 5: Status badge (Active=green dot + text, Inactive=red, Pending=yellow)
+      Col 6: joined date formatted "Jan 15, 2024"
+      Col 7: action buttons (pencil SVG edit + trash SVG delete + eye SVG view, 28px icon buttons)
+    Table header: sortable — click header → toggle asc/desc, show ▲/▼ SVG
+    Row hover: var(--surface2) bg
+    Checkbox header selects all → shows bulk action bar: "Delete Selected" + "Export Selected"
+    Pagination: styled Prev / 1 2 3 ... 12 / Next, current page highlighted
+
+  SettingsPage.tsx:
+    Left sub-tabs: Profile | Notifications | Appearance | Security | Integrations
+    Profile: 
+      Avatar upload area (80px dashed circle, "Click to upload" text, no actual upload)
+      First Name + Last Name in flex row
+      Email + Phone Number
+      Bio textarea (4 rows)
+      Website URL
+      Save Changes button (primary) + Discard (ghost)
+    Notifications: 6 toggle items, each row: label (bold) + description (muted small) + CSS animated toggle switch right-aligned
+      Toggle: 44×24px pill, thumb 20px circle, translateX transition 300ms, accent bg when on
+    Appearance:
+      Theme: 3 radio cards (Light/Dark/System) with SVG icons
+      Accent: 6 color dot presets + custom color picker
+      Font size: Small/Medium/Large radio
+      Density: Compact/Default radio
+    Security:
+      Change Password section: current + new + confirm inputs + submit
+      Password strength meter (same logic as auth pages)
+      2FA section: toggle + QR code placeholder (80×80px dashed box "QR Code")
+      Active Sessions: 3 rows (laptop SVG icon + "Chrome on Windows" + "Dhaka, BD" + "2 min ago" + "Revoke" button)
+    Integrations: 6 cards in 2×3 grid
+      Each card: 48px colored letter-mark div as logo + service name + description + status badge + connect/disconnect button
+      Services: GitHub (#1b1f24) / Slack (#4a154b) / Google Analytics (#f9ab00) / Stripe (#635bff) / Zapier (#ff4a00) / Figma (#f24e1e)
+
+  ReportsPage.tsx:
+    Sub-tabs: Weekly | Monthly | Quarterly | Annual (each shows different hardcoded data)
+    4 summary cards: Total Sales / New Leads / Closed Deals / Revenue Growth
+    SVG Grouped Bar Chart (100% width, 200px):
+      6 groups, 2 bars each (current=accent, previous=muted)
+      Calculated via svgCharts.barRects() for each series
+      Legend: 2 color squares + labels
+    Reports table: 8 rows, all columns styled
+    Filter row: date range text inputs + type dropdown + status dropdown
+    Export buttons row: CSV + PDF + Schedule + Email (styled, no function)
+
+  BillingPage.tsx:
+    Current Plan: large card, Pro badge, $29/mo, "Renews Jan 1, 2025", 6 features checklist, Upgrade CTA
+    3 Pricing cards (Starter $9 / Pro $29 highlighted with accent border ring / Enterprise Custom):
+      Feature checklist: ✓ (SVG checkmark, accent) / ✗ (SVG x, muted) per row
+      Pro card: "Most Popular" badge at top
+    Payment Method: credit card SVG icon + "•••• •••• •••• 4242" + "Visa" badge + Exp 12/27 + Update + Remove
+    Billing History: 8 rows, status badges, Invoice download button (SVG download icon)
+    Usage Meters: 3 bars
+      Each: label + "42GB of 100GB" text + progress bar (var(--accent) fill, full-width bg) + % badge
+      Colors: <70% green, 70–90% yellow, ≥90% red
+
+  NotificationsPage.tsx:
+    Header + unread count badge (accent bg, white text) + "Mark All as Read" button
+    Filter tabs: All | Unread | Mentions | System | Billing (underline style)
+    10 notifications with realistic varied content
+    Each: 40px avatar circle (colored initial) + action text (bold name + muted action) + timestamp ("2m ago") + unread dot (8px accent circle if unread) + "Mark read" button (appears on hover)
+    "Load More" button at bottom
+    Empty state (when all read): centered SVG checkmark illustration + "All caught up!" text
+
+AUTH PREVIEW (sub-tabs within colors tool): 5 pages per spec in Tool 8 below
+
+═══════════════════════════════════════════════════════════════
+SECTION 5 — TOOL 2: UI LIBRARY SHOWCASE
+═══════════════════════════════════════════════════════════════
+libraryThemes.ts — exports LIBRARY_THEMES: Record<LibraryId, LibraryTheme>
+Full CSS token objects for all 10 libraries (Material UI, Ant Design, Chakra UI, shadcn/Tailwind, Bootstrap 5, Mantine, Fluent UI, Radix UI, DaisyUI, Naive UI) — implement every CSS property exactly as described in previous prompt version. Each LibraryTheme object must have:
+  colors: {primary, secondary, bg, surface, border, text, textMuted, success, warning, error, info}
+  radius: {sm:number, md:number, lg:number, full:number}  (px values)
+  shadows: {sm:string, md:string, lg:string}
+  spacing: {base:number}  (multiplier unit in px)
+  typography: {fontFamily:string, fontSize:number, lineHeight:number, fontWeight:number}
+  button: {height:number, paddingX:number, borderRadius:number, fontWeight:number, textTransform:string, variants:{primary:CSSProps, secondary:CSSProps, outline:CSSProps, ghost:CSSProps, destructive:CSSProps}}
+  input: {height:number, paddingX:number, borderRadius:number, border:string, focusShadow:string, bgColor:string}
+  badge: {paddingX:number, paddingY:number, borderRadius:number, fontSize:number, fontWeight:number}
+  card: {borderRadius:number, border:string, shadow:string, padding:number}
+  table: {headerBg:string, rowHoverBg:string, borderColor:string, cellPadding:number}
+
+iconData.ts — exports LIBRARY_ICONS: Record<LibraryId, IconDefinition[]>
+  interface IconDefinition {
+    id: string
+    name: string
+    category: 'actions'|'navigation'|'data'|'communication'|'media'|'files'|'users'|'commerce'|'system'|'layout'|'status'|'time'|'maps'|'misc'
+    paths: {filled:string, outlined:string, rounded?:string, sharp?:string}  // SVG path d attributes, 24×24 viewBox
+  }
+  MINIMUM 200 IconDefinition entries per library, all unique hand-written SVG paths
+  Icon style guide per library:
+    MUI: filled smooth paths, 24×24, no stroke, filled shapes
+    Ant: 1.5px stroke, outlined thin geometric
+    Chakra: 1.5px stroke, Feather-inspired circles and simple lines
+    shadcn: 1.75px stroke, Lucide-style, clean geometric
+    Bootstrap: 1.5px stroke, classic web metaphors
+    Mantine: 1.5px stroke, Tabler-inspired refined
+    Fluent: 1.5px stroke, rounded friendly corners
+    Radix: 1px stroke, purely geometric minimal
+    DaisyUI: 2px stroke bold, Heroicons-inspired
+    Naive: 1px stroke, Carbon Icons technical precision
+
+ICON BROWSER — IconBrowser.tsx:
+  Sub-tab header: "🔣 Icons A–Z" + "200 icons" count label + search input
+  Category filter tabs: All + 14 categories (scrollable horizontal)
+  Main grid: CSS grid, 8 cols desktop / 5 tablet / 3 mobile, gap 8px
+  A–Z grouping: sticky letter header (16px Syne 700, muted color, full-width border-bottom) before each letter group
+  Icon cell: 56×56px, var(--surface2) bg, border-radius 8px, hover: border 1px solid var(--accent)
+    SVG 24×24 centered, current variant (filled/outlined/rounded/sharp)
+    Name below icon: 9px monospace, overflow ellipsis
+  Search: filters icons array in real-time (case-insensitive name match)
+  Category filter: shows only icons of selected category
+  Click icon → slide-in detail panel (320px, fixed right within preview, z-index high):
+    Icon name: 14px monospace bold
+    SVG preview: 64×64px centered in bordered box
+    Size slider 16–64px: updates SVG width/height live
+    Stroke width slider 0.5–3px (for outline variants)
+    Color picker: applies fill/stroke to SVG
+    Variant toggle buttons: Filled | Outlined | Rounded | Sharp (shows only available ones per icon)
+    SVG code block: syntax colored, scrollable
+    "Copy SVG" button → copies full <svg>...</svg> string
+    "Copy JSX" button → copies React SVG component
+    "Download .svg" → Blob download
+    Close ✕ button
+  "Copy All as SVG Sprite" → generates full <svg><defs>...</defs></svg> with all visible icons as <symbol> elements, triggers Blob download of icons.svg
+
+COMPONENT SHOWCASE — ComponentShowcase.tsx:
+  Left sub-nav: vertically scrollable list of 11 category sections
+  Main area: grid of component previews for selected category
+  Each component preview card:
+    Title + variant tabs
+    Live rendered preview using current library's theme CSS (inline styles from LIBRARY_THEMES)
+    State tabs: Default | Hover (CSS class toggle) | Focus | Disabled | Loading | Error (where applicable)
+    Size tabs: xs | sm | md | lg | xl (where applicable)
+    "Copy JSX" button → codeGenerators.generateReactComponent() for this component with current library
+    "Copy HTML+CSS" button → codeGenerators.generateHtmlComponent()
+    All components update visually when library is switched — same component tree, different inline styles from LIBRARY_THEMES
+
+  All component categories fully implemented (same list as before, including all subcomponents)
+
+  Charts section: uses svgCharts.ts utilities, 8 chart types rendered in current library's color palette
+
+PERFORMANCE LEADERBOARD — PerformanceLeaderboard.tsx:
+  Sortable table with rank medals + all metrics hardcoded accurately
+  SVG Radar Chart (300×300px):
+    6 axes drawn as lines from center with labels at tips
+    Per checked library: polygon calculated from normalized scores, different color, 0.2 opacity fill
+    Checkboxes to toggle libraries
+  UPDATE CHECKER: per-library "Check" button → 800ms CSS spinner animation → shows version status + changelog
+  Version timeline: 5 releases per library as CSS horizontal timeline with dots and dates
+
+LIBRARY DETAIL — LibraryDetail.tsx:
+  Full detail page per library (all specs from previous prompt version)
+  All real documentation URLs as external link buttons
+
+COMPARE MODE: split 50/50 with independent library selectors
+
+EXPORT PANEL: all 4 copy/save options per previous spec
+
+═══════════════════════════════════════════════════════════════
+SECTION 6 — TOOL 3–6 (Typography, Spacing, Shadows, Animations)
+═══════════════════════════════════════════════════════════════
+Implement exactly as specified in previous prompt version with these additions:
+
+Typography additions:
+  Google Font lazy loading: on font selection, check if <link> with that font URL already exists in <head>; if not, create and append it. System font fallback displayed immediately while loading.
+  "Generate Type Scale" button: creates a full CSS file content string for download
+
+Spacing additions:
+  Hover any element in preview → tooltip showing { padding: 16px, margin: 8px, gap: 8px }
+
+Shadow additions:
+  Per-layer "Copy this layer" button
+  "Combine with gradient" toggle: adds a gradient overlay on top of shadow card to see interaction
+
+Animation additions:
+  CSS @keyframes generated live: shown in code block below controls
+  "Preview on Text" toggle: shows animation applied to a heading text element too
+  Types extended: add Float / Sway / Glitch / Typewriter / Heartbeat / RollIn / LightSpeedIn / Hinge to the list
+
+═══════════════════════════════════════════════════════════════
+SECTION 7 — TOOL 7: BACKGROUND ANIMATION STUDIO (EXTENDED TO 60 TYPES)
+═══════════════════════════════════════════════════════════════
+ABSOLUTE CONSTRAINT: ZERO <canvas>. ZERO WebGL. ZERO external animation libraries.
+ALL animations: CSS @keyframes injected into <style id="bg-keyframes"> OR requestAnimationFrame loops updating inline styles on positioned <div> or <svg> elements.
+
+backgroundTypes.ts — exports BACKGROUND_TYPES: BackgroundType[]
+interface BackgroundType {
+  id: string
+  name: string
+  category: 'gradient'|'particles'|'geometric'|'waves'|'noise'|'interactive'|'abstract'|'retro'|'nature'|'data'
+  description: string
+  defaultParams: BackgroundParams
+  controls: ControlDefinition[]  // which sliders/pickers to show
+  cssMode: 'keyframes'|'raf'|'both'
+  generate: (params: BackgroundParams, container: HTMLElement) => CleanupFn
+}
+
+All 60 background types, each fully implemented in BackgroundRenderer.tsx:
+
+GRADIENT (10):
+  1. animated-gradient-mesh — 4 radial blobs, @keyframes on background-position
+  2. gradient-wave — linear gradient scrolling via background-position animation
+  3. aurora-borealis — 3 layered semi-transparent gradients counter-rotating
+  4. gradient-orbs — 4 positioned divs with radial gradient + float keyframes
+  5. hue-cycle — CSS filter:hue-rotate(0→360deg) @keyframes on solid bg
+  6. conic-sweep — conic-gradient + CSS transform:rotate @keyframes
+  7. gradient-morph — background-size 400% + background-position keyframe (classic)
+  8. gradient-pulse — radial gradient center size expands/contracts via @keyframes
+  9. gradient-diagonal — diagonal gradient moving at 45° via background-position
+  10. gradient-split — two solid halves with animated width (flex layout keyframes)
+
+PARTICLES (10):
+  11. floating-particles — 50 absolute divs, random 2–6px, rise up, staggered @keyframes animation-delay
+  12. starfield — 3 background-image dot layers (radial-gradient(circle, white 1px, transparent 1px)) at different background-size and animation-speed
+  13. fireflies — 20 absolute divs, 4px circles, yellow-green, blink + wander via @keyframes
+  14. confetti-rain — 30 elements with varied border-radius and rotation, fall via @keyframes
+  15. snowfall — 40 white circles, gentle drift + fall via @keyframes, varying opacity
+  16. bubble-float — 8 large 60–120px transparent circles, rise + gentle horizontal drift
+  17. matrix-rain — columns of falling characters (generate column divs, rAF updates top position, reset when off screen, colored green/cyan)
+  18. dot-rain — thin 1px dots falling in evenly spaced columns (CSS only, multiple animation durations)
+  19. meteor-shower — diagonal line elements with gradient tails, fall at angle via @keyframes
+  20. pollen-float — tiny soft circles with random wander rAF loop
+
+GEOMETRIC (10):
+  21. animated-grid — 1px grid lines, background-size pulsing scale via @keyframes
+  22. hexagon-grid — SVG <pattern> element with hex path, pattern animates via patternTransform
+  23. diagonal-stripes — repeating-linear-gradient, background-position scroll
+  24. dot-matrix-pulse — radial-gradient dot grid, background-size pulse @keyframes, wave effect via staggered box-shadow on multiple pseudo-elements
+  25. chevron-flow — repeating chevron SVG pattern in background-image, scrolling
+  26. circuit-board — SVG with PCB-style horizontal+vertical paths, stroke-dashoffset animation drawing effect
+  27. isometric-cubes — 12 CSS 3D cubes using transform: rotateX(45deg) rotateZ(45deg) on bordered divs arranged in grid, gentle float
+  28. triangle-mesh — SVG with 24 triangles, fill color animates via @keyframes hue cycle staggered
+  29. rotating-rings — multiple concentric SVG circles, counter-rotating at different speeds
+  30. morphing-squares — 4 large divs, border-radius morphing from 0→50% and back, staggered
+
+WAVES & FLUID (8):
+  31. svg-sine-wave — rAF updates SVG path d attribute: calculate y = amplitude * Math.sin(x/wavelength + time) for each x point, update polyline points
+  32. multi-layer-waves — 3 SVG paths with different amplitude/phase/color, same rAF approach as above, overlapping
+  33. liquid-blob — SVG path with @keyframes { 0%{d:path('M...')} 33%{d:path('M...')} 66%{d:path('M...')} 100%{d:path('M...')} } using 4 different blob shapes
+  34. ripple-rings — SVG circles expanding from center, opacity 1→0 as radius grows, staggered @keyframes
+  35. ocean-waves — CSS clip-path: polygon() with wave-like Y values, @keyframes interpolates between 2 wave shapes
+  36. lava-lamp — 5 large blobs with border-radius morph + position float, mix-blend-mode:screen
+  37. fluid-gradient — background-position animation on 400% size gradient creating fluid motion
+  38. water-ripple — rAF loop, on mount create expanding circle divs, cleanup when opacity=0
+
+NOISE & TEXTURE (6):
+  39. svg-grain — SVG feTurbulence with baseFrequency animation (seed changing every 100ms) overlaid at 15% opacity
+  40. bokeh-blur — 6 large 100–200px colored circles with filter:blur(40–80px) + slow drift @keyframes
+  41. frosted-glass — animated gradient mesh behind a blur overlay (for glassmorphism bg)
+  42. film-grain — fast-animating feTurbulence (different seed each frame via rAF) creating film grain
+  43. linen-texture — static SVG feTurbulence with feColorMatrix creating fabric look + very slow drift
+  44. noise-field — rAF generates array of colored 4px divs in grid, each opacity based on noise function (simple: Math.sin(x*0.1)*Math.cos(y*0.1))
+
+INTERACTIVE (6):
+  45. mouse-gradient — radial gradient follows cursor: mousemove updates CSS vars --mx --my, gradient: radial-gradient(circle at var(--mx) var(--my), color1, color2)
+  46. parallax-stars — 3 star div layers, mousemove handler: each layer translateX/Y by fraction of cursor offset from center
+  47. click-ripple — mousedown on container creates absolute div circle, scale 0→4 + opacity 1→0 @keyframes, removes self on animationend
+  48. magnetic-particles — 30 divs, rAF: each calculates distance to mouse, applies repulsion translateX/Y if within 100px radius
+  49. cursor-trail — rAF stores last 20 mouse positions, renders small fading dots at each position
+  50. gravity-orbs — 5 large orbs, rAF physics: velocity + gentle gravity toward center + mouse repulsion, update positions
+
+ABSTRACT & ARTISTIC (10):
+  51. breathing — single large radial gradient, background-size: 100%→150%→100%, slow @keyframes 8s infinite
+  52. color-rain — 25 1px wide full-height divs, each with different color gradient and animation-duration, falling
+  53. vortex — conic-gradient with transparent gap, continuous transform:rotate @keyframes
+  54. light-rays — conic-gradient with alternating opaque/transparent wedges (10 rays), slow rotation
+  55. neon-pulse — bordered div with neon glow box-shadow, opacity pulse @keyframes
+  56. kaleidoscope — 8 divs with same gradient, each rotated by 45°×n, mix-blend-mode:screen, all rotate together
+  57. northern-lights — SVG paths with animated fill color cycling through cool palette + subtle vertical movement
+  58. deep-ocean — multiple blue/teal gradient layers, slow undulation via background-position
+  59. plasma — overlapping radial gradients with different animation speeds creating plasma effect
+  60. glitch — periodic: briefly applies CSS filter:hue-rotate + clip-path horizontal band displacement @keyframes with random trigger
+
+BackgroundRenderer.tsx:
+  useEffect: on type/params change → stop previous rAF loops → clear keyframes → generate new CSS → inject → start new rAF loops if needed
+  cleanupRef: stores cleanup functions to call on unmount or type change
+  Returns a div with position:relative, overflow:hidden, width/height 100%, containing the background elements
+
+Left Controls per type:
+  Primary color picker + Secondary + Accent (all types)
+  Speed slider 0.25×–5× (modifies animation-duration in generated CSS)
+  Opacity/Intensity 0–100% slider
+  Count 10–200 slider (where applicable: particles, stars, drops)
+  Element size slider (where applicable)
+  Blur 0–40px (where applicable)
+  Direction: 4-arrow pad for directional types OR angle slider for gradient types
+  Custom params per type (e.g. wave amplitude, orb count, stripe width)
+
+20 named preset configs: each stored as {typeId, params} object, rendered as live animated thumbnail previews (80×50px divs running the actual animation at reduced count)
+
+Randomize button: picks random type, generates harmonious random 3-color palette, applies
+
+"Copy as CSS": codeGenerators generates complete self-contained CSS (includes all keyframes, all necessary HTML structure comment)
+"Copy as React Component": generates complete self-contained AnimatedBackground.tsx component with all needed inline styles and useEffect
+
+Preview sub-tabs: 🏠 Home | 🔐 Login | 📊 Dashboard
+  Each renders realistic page content overlay on animated background
+  Home: semi-opaque navbar + hero card (backdrop-filter: blur(8px), rgba bg)
+  Login: centered form card (backdrop-filter: blur(12px))
+  Dashboard: sidebar (opaque surface color) + main with semi-transparent content cards
+  Background animation continues running when switching preview tabs
+
+═══════════════════════════════════════════════════════════════
+SECTION 8 — TOOL 8: AUTH PAGE DESIGNER
+═══════════════════════════════════════════════════════════════
+10 auth page types, 6 layout styles, full implementation as per previous prompt version plus:
+  "Apply Background Studio animation" toggle → renders current active background animation behind the auth form
+  All code generators output complete, runnable files
+  ZIP export option: downloads complete project folder (index.html + styles.css + auth-page.html)
+
+═══════════════════════════════════════════════════════════════
+SECTION 9 — TOOL 9: LIVE CODE EDITOR (NEW FULL TOOL)
+═══════════════════════════════════════════════════════════════
+The most important new tool. A full in-browser live coding environment.
+
+State interface:
+  interface CodeEditorState {
+    language: LanguageMode
+    code: string
+    splitRatio: number        // 0.3–0.7, percentage of left pane
+    theme: 'dark'|'light'
+    fontSize: number          // 12–20px
+    wordWrap: boolean
+    autoRun: boolean          // re-render on every keystroke vs manual
+    files: ProjectFile[]      // multi-file project
+    activeFile: string        // filename
+    selectedComponent: string // for component-specific preview
+  }
+
+LANGUAGE MODES:
+  HTML → renders in <iframe srcdoc="...">
+  CSS → applies to a preview div containing sample HTML structure
+  HTML+CSS → combined render in iframe (two editors side by side)
+  JSX/TSX → transpile-free approach: use Function() to evaluate simple JSX-like templates, OR provide a predefined set of JSX snippets that render as HTML equivalents. For complex JSX: render the code as text in styled code block + show a "best-effort" component preview using eval()-safe pattern.
+  SCSS → simple SCSS→CSS transpilation for basic features (variables $var, nesting, &, simple mixins) implemented in pure JS without external library
+  Tailwind HTML → renders in iframe with Tailwind CDN link injected into srcdoc
+  Vue SFC → renders Vue template section as HTML, script as data-driven DOM (simplified)
+  Svelte → same approach as Vue (template section rendered as HTML)
+  React Component → renders the return() JSX structure as HTML equivalent
+
+CODE EDITOR PANE — CodeEditorPane.tsx:
+  Textarea-based editor with syntax highlighting overlay technique:
+    - Underlying <textarea>: transparent text, handles all input
+    - Overlying <pre><code>: same content, pointer-events none, applies syntax highlighting via CSS
+    - Syntax highlight via pure JS tokenizer in colorMath.ts (no external lib):
+      HTML: tag names (accent), attributes (yellow), values (green), comments (muted), doctype (purple)
+      CSS: selectors (accent), properties (blue), values (green), units (orange), comments (muted)
+      JS/TS: keywords (purple), strings (green), numbers (orange), comments (muted), functions (blue)
+    - Both textarea and pre scroll in sync (onScroll handler)
+  Line numbers: absolutely positioned div left of editor, calculates line count from code.split('\n').length
+  Tab key: preventDefault, insert 2 spaces at cursor position via selectionStart/selectionEnd
+  Ctrl/Cmd+S: format/prettify code (basic formatter: consistent indentation)
+  Ctrl/Cmd+/: toggle line comment
+  Font: JetBrains Mono, configurable size 12–20px
+  Theme: dark (--bg #1e1e30, --text #e2e2f0) or light
+
+FILE TABS BAR:
+  Multiple project files as tabs (+ New File button)
+  Click tab → switch active file
+  Double-click tab → rename file
+  ✕ on tab → delete file (confirm if it has content)
+  Files can be: .html / .css / .scss / .js / .ts / .tsx / .jsx / .vue / .svelte / .json
+
+LIVE PREVIEW PANE — LivePreviewPane.tsx:
+  HTML/CSS/HTML+CSS/Tailwind: renders in <iframe> with srcdoc attribute
+    For Tailwind: srcdoc includes <script src="https://cdn.tailwindcss.com"> in head
+    For CSS: srcdoc wraps content in <style> + standard HTML structure with sample elements
+    Error catching: window.onerror in iframe → sends postMessage to parent → shows error overlay
+  JSX/TSX/React: 
+    Parse code to extract component structure
+    Render simplified version using React's actual render (since we're in React app)
+    Show "Component Preview" mode: eval the return statement as template literal + innerHTML approach
+    Error boundary catches any eval errors → shows error message
+  SCSS:
+    JS SCSS processor (implement simplified):
+      - Variables: replace $varName: value; then $varName usage
+      - Nesting: unwrap nested rules by concatenating parent + child selector
+      - & reference: replace & with parent selector
+      - Basic mixins: @mixin name { } and @include name
+    Apply processed CSS to iframe preview
+  Vue/Svelte: extract <template> content → render as HTML in iframe
+
+Auto-run toggle: if ON, re-renders on every keystroke (debounced 300ms). If OFF, "Run" button triggers render.
+Split resize: drag handle between editor and preview, updates splitRatio
+Device frame integration: preview pane respects current device frame setting from global navbar
+
+COMPONENT GALLERY sidebar (inside Code Editor):
+  Panel on left side of editor: searchable list of 80 ready-made code snippets
+  Categories: Layout / Navigation / Cards / Forms / Tables / Modals / Buttons / Badges / Charts / Auth
+  Each snippet: name + tiny preview thumbnail (CSS background representation)
+  Click → inserts snippet code into current editor position
+  Snippets available for each active language mode
+
+CONSOLE PANEL (bottom, collapsible):
+  Shows: console.log outputs (captured via overriding console in iframe), error messages, warnings
+  Clear button
+  Monospace font, dark bg
+
+CODE FORMATTER (Ctrl+S or Format button):
+  HTML: basic indentation (parse tags, indent children by 2 spaces)
+  CSS: sort properties within each rule block alphabetically
+  JS/TS: consistent semicolons, 2-space indentation
+
+ZIP EXPORT — ZipExportPanel.tsx:
+  "Export Project as ZIP" button → zipExporter.exportReactProject() or exportHtmlProject() based on language mode
+  ZIP contents for React mode:
+    package.json: { name: "designlab-export", scripts: {dev:"vite", build:"vite build"}, dependencies: {react:"^18.3.1", "react-dom":"^18.3.1"}, devDependencies: {vite:"^5.4.2", "@vitejs/plugin-react":"^4.3.1", typescript:"^5.5.3"} }
+    vite.config.ts: standard config
+    tsconfig.json: standard React config
+    index.html: standard Vite entry
+    src/main.tsx: standard React root
+    src/App.tsx: imports and renders the user's component
+    src/[filename]: all project files from the file tabs
+  ZIP contents for HTML mode:
+    index.html (user's HTML)
+    styles.css (user's CSS or extracted from HTML)
+    readme.txt: "Open index.html in browser to view"
+  Triggers download: filename = "designlab-export-{timestamp}.zip"
+  Shows progress: "Creating ZIP... ✓ Ready!" toast
+
+═══════════════════════════════════════════════════════════════
+SECTION 10 — TOOL 10: FIGMA-LIKE DRAG & DROP CANVAS
+═══════════════════════════════════════════════════════════════
+State interface:
+  interface CanvasState {
+    elements: CanvasElement[]
+    selectedIds: string[]
+    zoom: number            // 0.25–3.0
+    panX: number
+    panY: number
+    gridSnap: boolean
+    gridSize: number        // 8px default
+    showGrid: boolean
+    artboardSize: 'desktop'|'tablet'|'mobile'|'custom'
+    artboardW: number
+    artboardH: number
+    history: CanvasElement[][]  // for undo/redo
+  }
+  interface CanvasElement {
+    id: string
+    type: 'container'|'text'|'button'|'input'|'image'|'icon'|'card'|'navbar'|'divider'|'badge'|'avatar'|'form'|'table'|'chart'
+    x: number         // position in artboard space
+    y: number
+    w: number
+    h: number
+    rotation: number  // degrees
+    locked: boolean
+    visible: boolean
+    styles: React.CSSProperties
+    content: string   // text content where applicable
+    children: string[] // child element IDs for containers
+    props: Record<string, any> // element-specific config
+  }
+
+CANVAS AREA — DragDropCanvas.tsx:
+  Outer: overflow hidden, position relative, --bg color
+  Inner transform div: transform: scale(zoom) translate(panX, panY)
+  Artboard: white rectangle at 0,0 with artboardW×artboardH size, drop shadow
+  Grid overlay: CSS background-image dot grid when showGrid is true
+  
+  Pan: middle mouse button drag OR Alt + left drag → updates panX/panY
+  Zoom: Ctrl+scroll wheel → updates zoom 0.25→3.0 in 0.1 steps. Pinch gesture (two-touch): zoom update.
+  Zoom controls: bottom bar with - / % / + buttons + "Fit" button (resets pan/zoom to show full artboard)
+
+  ELEMENT RENDERING:
+  Each CanvasElement rendered as absolute div positioned at x,y with width w, height h, transform:rotate(rotation+deg)
+  Renders component based on type with current styles applied
+  Selected elements: 1px solid accent border, corner resize handles (8 small squares), rotation handle (circle above top-center)
+
+  SELECTION:
+  Click element → select (clears others unless Shift held)
+  Shift+click → multi-select
+  Click empty canvas → deselect all
+  Drag on empty canvas → rubber-band selection rectangle (shows which elements fall inside)
+  Arrow keys: move selected elements by gridSize pixels (1px if gridSnap off)
+  Delete/Backspace: delete selected elements
+
+  DRAG TO MOVE:
+  mousedown on element → track mousemove → update element x/y accounting for zoom
+  Grid snap: round to nearest gridSize if enabled
+  Show element x/y/w/h in inspector while dragging
+
+  RESIZE HANDLES:
+  8 handles: 4 corners + 4 midpoints
+  mousedown on handle → mousemove resizes from appropriate edges
+  Shift held during corner resize: maintain aspect ratio
+  Min size: 16×16px
+
+  ROTATION HANDLE:
+  Circle 8px, 24px above top-center
+  mousedown → mousemove: calculate angle from element center to mouse → update rotation
+  Shift: snap to 15° increments
+
+  Z-ORDER:
+  Right-click element → context menu: Bring Forward / Send Backward / Bring to Front / Send to Back / Group / Ungroup / Lock / Duplicate
+  Context menu: absolute positioned div, appears at click position, 160px wide
+
+COMPONENT PALETTE — ComponentPalette.tsx:
+  Left 220px panel (or collapsible)
+  Search input at top
+  Sections: Layout | Navigation | Content | Forms | Data | Media
+  Each component: draggable item (drag from palette to canvas adds element at drop position)
+  Drag: mousedown on palette item → create ghost element following cursor → on drop over artboard → addElement() with position calculated
+  Components in palette: Container, Text, Heading, Button, Input, Select, Textarea, Image placeholder, Icon, Card, Navbar, Sidebar mini, Divider, Badge, Avatar, Stat card, Data table, Form, Chart placeholder, Modal overlay, Tooltip
+
+CANVAS INSPECTOR — CanvasInspector.tsx:
+  Right 260px panel, shows selected element's properties
+  No selection: shows artboard settings (size, bg color)
+  Single selection: shows all editable props:
+    X, Y number inputs | W, H number inputs (linked aspect ratio toggle)
+    Rotation number input + SVG rotation icon
+    Opacity 0–100% slider
+    Background: color picker + gradient toggle
+    Border: width + color + radius (4 individual corners or all-same toggle)
+    Shadow: x/y/blur/spread/color + add layer
+    Typography (if text/button/badge): font family (input), size, weight, color, align, line-height, letter-spacing
+    Padding (if container): 4 individual or all-same
+    Content (if text/button): textarea input, updates rendered text live
+    Specific props per type: button variant, input placeholder, badge color, avatar initials/color
+
+LAYERS PANEL:
+  Below palette or as separate sub-tab
+  Shows all elements as list (most recent on top = top z-index)
+  Each row: visibility eye SVG toggle + lock padlock SVG toggle + type icon + name (double-click to rename) + z-index indicator
+  Drag rows to reorder (updates z-order)
+  Indented children under container elements
+
+LIVE CODE GENERATION (the key feature):
+  Below inspector: "Generated Code" collapsible section
+  ALWAYS showing — updates live as any element changes
+  Language toggle: HTML+CSS | JSX | Tailwind HTML
+  Generated code shows the COMPLETE code for the ENTIRE artboard content
+  HTML+CSS: each element as a div with inline styles, semantic tags where appropriate (h1/h2 for heading, button for button, etc.), wrapper div represents artboard
+  JSX: functional component with inline styles, clean component name
+  Tailwind HTML: uses Tailwind utility classes instead of inline styles (maps style values to nearest Tailwind class)
+  Code block: syntax highlighted + copy button + "Open in Code Editor" button (sends code to Tool 9)
+  "Export Artboard as ZIP" button: same ZIP export as Tool 9 but auto-generated from canvas state
+
+ARTBOARD PRESETS:
+  Dropdown: Desktop 1440×900 / Laptop 1280×800 / Tablet 768×1024 / Mobile 390×844 / A4 Portrait / A4 Landscape / Square 1080×1080 / Twitter Card / OG Image 1200×630
+  Custom: W and H number inputs
+
+CANVAS TOOLBAR (top horizontal bar):
+  Select tool (V) | Hand/Pan tool (H) | Text tool (T, click canvas to add text element) | Rectangle tool (R, draw to create container) | Comment tool (C, adds a comment sticky note)
+  Artboard size preset selector
+  Grid: show/hide + snap toggle + size input
+  Zoom: fit / 50% / 100% / 200% / custom input
+  Preview mode toggle: hides all handles/grid/selection, shows clean artboard only
+
+═══════════════════════════════════════════════════════════════
+SECTION 11 — GLOBAL EXPORT MODAL
+═══════════════════════════════════════════════════════════════
+Full-screen modal (backdrop blur, escape to close):
+  Tabs: CSS Variables | SCSS Variables | Tailwind Config | Style Dictionary | Figma Tokens | Design Brief | Full Project ZIP
+  Each tab: syntax-highlighted JetBrains Mono code block + "Copy All" + "Download" button
+  Full Project ZIP tab: packages EVERYTHING from all tools into one ZIP:
+    /tokens/tokens.css
+    /tokens/_tokens.scss
+    /tokens/tailwind.config.js
+    /tokens/tokens.json
+    /auth-pages/ (all 10 auth pages as HTML files)
+    /backgrounds/ (all active background as AnimatedBackground.tsx)
+    /canvas-export/ (current canvas artboard as index.html + styles.css)
+    /code-editor/ (all files from code editor tabs)
+    readme.md: describes the export contents
+
+═══════════════════════════════════════════════════════════════
+SECTION 12 — PERFORMANCE & CODE QUALITY REQUIREMENTS
+═══════════════════════════════════════════════════════════════
+TypeScript: strict mode, no `any` except where absolutely unavoidable, all interfaces in types/index.ts
+State: Zustand stores for global state, local useState for UI-only state
+Rendering: React.memo on all preview panels and heavy components, useMemo for all derived values (contrast ratios, gradient CSS strings, chart points, generated code)
+Event handlers: useCallback for all handlers passed as props
+Refs: useRef for canvas DOM element, rAF IDs, interval IDs (all cleaned up in useEffect cleanup)
+CSS: CSS Modules for component styles, CSS custom properties for all theme values, no hardcoded color strings outside theme files
+Zero inline styles on shell components (only on preview components that simulate other libraries)
+All SVG icons: defined as path strings in a single icons.ts file, rendered via SvgIcon.tsx
+Error boundaries: wrap each tool tab and each preview panel
+Loading states: all font loads show skeleton/placeholder until loaded
+Accessibility: aria-label on all icon buttons, role on all interactive elements, tabIndex management, focus visible outlines
+Responsive: tool works at 1024px min-width, control panel collapses at 1280px, all previews scroll on small screens
+File size: keep each file focused and under 500 lines by splitting into sub-components
+
+FINAL VERIFICATION CHECKLIST (run before submitting):
+  □ All imports resolve to existing files
+  □ package.json includes all required dependencies
+  □ vite.config.ts is valid
+  □ No TypeScript errors (types match usage everywhere)
+  □ Every tool tab renders without crash
+  □ Every button produces visible result or toast
+  □ All SVG charts use real math (no placeholder boxes)
+  □ All background animations run without canvas/WebGL
+  □ ZIP export triggers actual download
+  □ Code editor renders HTML/CSS in iframe
+  □ Canvas drag/drop/resize all work
+  □ Live code generation updates on every canvas change
+  □ Undo/redo works in every tool
+  □ Dark/light theme toggle works instantly
+  □ Device frame switching updates preview correctly
+  □ All clipboard operations show toast
+  □ Font loading is lazy (not all 20 on startup)
+  □ No memory leaks: all rAF and intervals cleaned up
+  □ Zero console errors on initial load
