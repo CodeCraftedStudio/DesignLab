@@ -1,7 +1,7 @@
-import { Router, type IRouter } from "express";
+import express from "express";
 import healthRouter from "./health";
 
-const router: IRouter = Router();
+const router = express.Router();
 
 router.use(healthRouter);
 
