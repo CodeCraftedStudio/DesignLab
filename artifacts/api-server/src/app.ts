@@ -1,13 +1,16 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import { pinoHttp } from "pino-http";
+import pinoHttpFactory from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Handle ESM/CommonJS default export differences
+const pinoHttp = (pinoHttpFactory as any).default || pinoHttpFactory;
+
 app.use(
-  pinoHttp({
+  (pinoHttp as any)({
     logger,
     serializers: {
       req(req: any) {
