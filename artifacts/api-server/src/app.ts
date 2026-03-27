@@ -1,10 +1,10 @@
-import express, { type Express } from "express";
+import * as express from "express";
 import cors from "cors";
 import pinoHttpFactory from "pino-http";
-import router from "./routes";
-import { logger } from "./lib/logger";
+import router from "./routes/index.js";
+import { logger } from "./lib/logger.js";
 
-const app: Express = express();
+const app = express();
 
 // Handle ESM/CommonJS default export differences
 const pinoHttp = (pinoHttpFactory as any).default || pinoHttpFactory;
